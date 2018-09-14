@@ -1,3 +1,5 @@
+# WORK IN PROGRESS - not ready for use yet!
+
 # generator-jhipster-axon-cqrs
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > JHipster module, Generator for Axon framework based CQRS project using Kafka &amp; MongoDb
