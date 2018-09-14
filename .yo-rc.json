@@ -1,0 +1,10 @@
+{
+  "generator-jhipster-module": {
+    "promptValues": {
+      "githubName": "pankesh",
+      "authorName": "Pankesh Contractor",
+      "authorEmail": "panksdmz-java@yahoo.com",
+      "authorUrl": ""
+    }
+  }
+}
