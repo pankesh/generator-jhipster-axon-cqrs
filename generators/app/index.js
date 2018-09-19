@@ -62,7 +62,7 @@ module.exports = class extends BaseGenerator {
                 default: 'command',
                 store: true
             }
-];
+        ];
 
         const done = this.async();
         this.prompt(prompts).then((props) => {
@@ -72,6 +72,32 @@ module.exports = class extends BaseGenerator {
             done();
         });
     }
+
+    get configuring() {
+        //use this section to copy all config yml,xml,properties etc and to setup the dependencies
+        return {
+            addAxonCommandDependencies() {
+                this.buildTool = this.jhipsterAppConfig.buildTool
+                this.log(`\nInside Configuring. Build tool=${this.buildTool}`);
+                if (this.buildTool === 'maven') {
+                    this.addMavenProperty('axon.version',moduleConstants.AXON_VERSION)
+                    this.addMavenDependency('org.axonframework', 'axon-amqp', '${axon.version}');
+                    this.addMavenDependency('org.axonframework', 'axon-mongo', '${axon.version}');
+                    this.addMavenDependency('org.axonframework', 'axon-kafka', '${axon.version}');
+                    this.addMavenDependency('org.apache.kafka', 'kafka-clients', '1.0.1');
+                    this.addMavenDependency('org.axonframework','axon-test','${axon.version}','','test')
+                } else if (this.buildTool === 'gradle') {
+                    this.log(`\nAbout to add Gradle Dependencies`);
+                    this.addGradleDependency('compile', 'org.axonframework', 'axon-amqp', moduleConstants.AXON_VERSION);
+                    this.addGradleDependency('compile', 'org.axonframework', 'axon-mongo', moduleConstants.AXON_VERSION);
+                    this.addGradleDependency('compile', 'org.axonframework', 'axon-kafka', moduleConstants.AXON_VERSION);
+                    this.addGradleDependency('compile', 'org.apache.kafka', 'kafka-clients', moduleConstants.KAFKA_CLIENT_VERSION);
+                    this.addGradleDependency('testCompile', 'org.axonframework', 'axon-test', moduleConstants.AXON_VERSION);
+                }
+            }
+        };
+    }
+
 
     writing() {
         // function to use directly template
@@ -101,6 +127,7 @@ module.exports = class extends BaseGenerator {
 
         // variable from questions
         this.message = this.props.message;
+        this.axonModules = this.props.axonModules;
 
         // show all variables
         this.log('\n--- some config read from config ---');
@@ -120,7 +147,13 @@ module.exports = class extends BaseGenerator {
 
         this.log('\n--- variables from questions ---');
         this.log(`\nmessage=${this.message}`);
+        this.log(`axonModules=${this.axonModules}`);
         this.log('------\n');
+
+        if (this.axonModules === 'command') {
+            // write all of the axon command files
+            this.template('src/main/java/package/config/_AxonCommandConfiguration.java', `${javaDir}config/AxonCommandConfiguration.java`);
+        }
 
         if (this.clientFramework === 'angular1') {
             this.template('dummy.txt', 'dummy-angular1.txt');
@@ -134,6 +167,8 @@ module.exports = class extends BaseGenerator {
         if (this.buildTool === 'gradle') {
             this.template('dummy.txt', 'dummy-gradle.txt');
         }
+
+
     }
 
     install() {
